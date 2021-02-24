@@ -40,10 +40,13 @@ import {Icon} from 'react-native-elements';
 import {useUserConnected, useUserSetConnected} from '../../store/hooks/user';
 import {ForecastDayModel} from '../../shared/models/forecast-day.model';
 import {ForecastModel} from '../../shared/models/forecast.model';
-// Listener para verificar conexão
+import {FAB} from 'react-native-paper';
 
 
 export default function Home({navigation}: any) {
+    const [state, setState] = React.useState({open: false});
+    const onStateChange = ({open}: any) => setState({open});
+    const {open} = state;
 
     const lat = useWeatherLatitude();
     const lon = useWeatherLongitude();
@@ -217,14 +220,33 @@ export default function Home({navigation}: any) {
                         : <></> }
 
                         <Footer>
-                            <TouchableOpacity style={{width: '100%'}} onPress={() => getPosition()}>
-                                <Text>ATUALIZAR</Text>
-                            </TouchableOpacity>
+
                         </Footer>
                     </BottomBar>
 
                 </ScrollPage>
             </MilkScroll>
+            <FAB.Group
+                open={open}
+                visible={true}
+                icon={open ? 'swap-vertical-bold' : 'plus'}
+                color={themeContext.palette.logo}
+                fabStyle={{backgroundColor: themeContext.palette.text}}
+                actions={[
+                    {
+                        icon: 'refresh',
+                        label: 'Atualizar',
+                        color: themeContext.palette.success,
+                        onPress: getPosition,
+                    }
+                ]}
+                onStateChange={onStateChange}
+                onPress={() => {
+                    if (open) {
+                        console.log('open')
+                    }
+                }}
+            />
         </>
     )
 };

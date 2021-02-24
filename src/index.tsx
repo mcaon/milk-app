@@ -15,11 +15,12 @@ import Snackbar from './components/Snackbar';
 import {Icon} from 'react-native-elements';
 import Home from './pages/Home';
 import {Loader} from './components/common';
+import {PersistGate} from 'redux-persist/integration/react'
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
-const { store } = configureStore();
+const {store, persistor} = configureStore();
 
 const HomeTabs = () => {
     return (
@@ -30,11 +31,14 @@ const HomeTabs = () => {
 
                     switch (route.name) {
                         case 'Home':
-                            iconName = 'home'; break;
+                            iconName = 'home';
+                            break;
                         case 'Profile':
-                            iconName = 'account-circle'; break;
+                            iconName = 'account-circle';
+                            break;
                         case 'Settings':
-                            iconName = 'settings'; break;
+                            iconName = 'settings';
+                            break;
 
                     }
                     return <Icon type={'material'} name={iconName} size={30} color={color}/>
@@ -44,7 +48,7 @@ const HomeTabs = () => {
                 activeTintColor: theme.palette.logo,
                 inactiveTintColor: 'gray',
             }}>
-            <Tab.Screen name="Home" component={Home} />
+            <Tab.Screen name="Home" component={Home}/>
         </Tab.Navigator>
     );
 }
@@ -61,17 +65,19 @@ const App = () => {
             <SafeAreaView style={styles.topSafeArea}/>
             <SafeAreaView style={styles.bottomSafeArea}>
                 <Provider store={store}>
-                    <PaperProvider>
-                        <NavigationContainer ref={NavigationService.navigationRef} >
-                            <ThemeProvider theme={theme}>
-                                <Stack.Navigator initialRouteName="Home">
-                                    <Stack.Screen name="Home" component={HomeTabs} options={{headerShown: false}}/>
-                                </Stack.Navigator>
-                            </ThemeProvider>
-                        </NavigationContainer>
-                        <Snackbar />
-                        <Loader/>
-                    </PaperProvider>
+                    <PersistGate loading={null} persistor={persistor}>
+                        <PaperProvider>
+                            <NavigationContainer ref={NavigationService.navigationRef}>
+                                <ThemeProvider theme={theme}>
+                                    <Stack.Navigator initialRouteName="Home">
+                                        <Stack.Screen name="Home" component={HomeTabs} options={{headerShown: false}}/>
+                                    </Stack.Navigator>
+                                </ThemeProvider>
+                            </NavigationContainer>
+                            <Snackbar/>
+                            <Loader/>
+                        </PaperProvider>
+                    </PersistGate>
                 </Provider>
             </SafeAreaView>
 

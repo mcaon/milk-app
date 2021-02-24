@@ -15,12 +15,13 @@ export function* setForecast() {
     } catch (e) {
       console.log('error setForecast')
       console.log(e)
-      setSnackbarInfos('Erro ao atualizar Previsão do Tempo', true);
+      yield put(Creators.forecastFailed(e));
+      const connected = yield select(state => state.user.connected);
+      setSnackbarInfos(connected ? 'Erro ao Atualizar. Tente Novamente' : 'Erro ao Atualizar, utilizando últimos valores salvos.', true);
     }
-
-
   } catch (error) {
     setSnackbarInfos('Erro ao atualizar Previsão do Tempo', true);
+    yield put(Creators.forecastFailed(null));
     console.log('Erro ao atualizar Previsão do Tempo');
     console.log(error.message, true);
   }
