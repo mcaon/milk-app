@@ -10,6 +10,8 @@ target 'MilkApp' do
 
   pod 'react-native-netinfo', :path => '../node_modules/@react-native-community/netinfo'
 
+  pod 'react-native-geolocation', :path => '../node_modules/@react-native-community/geolocation'
+
   target 'MilkAppTests' do
     inherit! :complete
     # Pods for testing

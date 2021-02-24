@@ -1,3 +1,5 @@
+import { format } from 'date-fns'
+
 const getMonthBr = (month: number): string => {
   let dateReturn = '';
   switch (month) {
@@ -41,6 +43,11 @@ const getMonthBr = (month: number): string => {
   return dateReturn;
 }
 
+const dateDDMMYYYYandHours = (date: any) => {
+  const formatted = format(date, 'dd/MM/yyyy HH:mm:ss')
+  return formatted
+}
+
 const maskDateMMYYYY = (date: any) => {
   date = date.replace(/\D/g, ''); // Remove tudo o que não é dígito
   date = date.replace(/^(\d{2})(\d)/, '$1/$2'); // Coloca ponto entre o segundo e o terceiro dígitos
@@ -56,5 +63,6 @@ const maskDateDDMMYYYY = (date: any) => {
 export default {
   getMonthBr,
   maskDateMMYYYY,
-  maskDateDDMMYYYY
+  maskDateDDMMYYYY,
+  dateDDMMYYYYandHours
 };

@@ -17,7 +17,6 @@ export const BottomBar = styled.View`
 export const Footer = styled.View`
     align-items: center;
     justify-content: space-between;
-    flex-direction: row;
     flex: 1;
     padding: 15px 20px 15px 20px;
 `;
