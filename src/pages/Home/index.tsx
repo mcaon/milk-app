@@ -1,35 +1,55 @@
-import React, {useCallback, useContext, useEffect, useState} from 'react';
-import {MilkScroll, BottomBar, Footer, ScrollPage, TextContainer, TopInfo} from './styles';
-import {Dimensions, PermissionsAndroid, Image, TouchableOpacity, Text, View} from 'react-native';
+import React, {useCallback, useContext, useEffect} from 'react';
+import {
+    MilkScroll,
+    BottomBar,
+    Footer,
+    ScrollPage,
+    TextContainer,
+    CurrentDayIconView,
+    CityText,
+    ForecastContainer,
+    ForecastInternalContainer,
+    ForecastBlockContainer,
+    DescriptionText,
+    ForecastIconView,
+    ForecastDataView, NetStatusView, ForecastDaysContainer, SelectorText, Selector, ForecastDaysDetailsView
+} from './styles';
+import {Dimensions, PermissionsAndroid, TouchableOpacity, Text, View} from 'react-native';
 // @ts-ignore
 import {ThemeContext} from 'styled-components/native';
-import {LogoView, PageTitle, TopBar} from '../../styles';
-import {Icon} from 'react-native-elements';
-import {black} from 'react-native-paper/lib/typescript/styles/colors';
-import NetInfo from "@react-native-community/netinfo";
+import {PageTitle, TopBar} from '../../styles';
+import NetInfo from '@react-native-community/netinfo';
 import Geolocation, {GeolocationConfiguration} from '@react-native-community/geolocation';
 import {
+    useWeatherForecast,
     useWeatherLastUpdate,
     useWeatherLatitude,
     useWeatherLongitude,
     useWeatherSetForecast,
     useWeatherSetLatitude, useWeatherSetLongitude
 } from '../../store/hooks/weather';
-import {Dates} from '../../utils';
+import {Dates, Weather} from '../../utils';
+import {Icon} from 'react-native-elements';
+import {useUserConnected, useUserSetConnected} from '../../store/hooks/user';
+import {ForecastDayModel} from '../../shared/models/forecast-day.model';
 // Listener para verificar conexão
-// const subscribe = NetInfo.addEventListener(state => {
-//     console.log("Connection type", state.type);
-//     console.log("Is connectedsss?", state.isConnected);
-// });
+
 
 export default function Home({navigation}: any) {
 
     const lat = useWeatherLatitude();
     const lon = useWeatherLongitude();
+    const forecast = useWeatherForecast();
+    const connected = useUserConnected();
+    const setConnected = useUserSetConnected();
     const lastUpdate = useWeatherLastUpdate();
     const setLatitude = useWeatherSetLatitude();
     const setLongitude = useWeatherSetLongitude();
-
+    const subscribe = NetInfo.addEventListener(state => {
+        console.log("Connection type", state.type);
+        console.log("Is connected LISTENER?", state.isConnected);
+        setConnected(state.isConnected);
+    });
     const setForecast = useWeatherSetForecast();
 
     const handleForecast = useCallback(() => {
@@ -38,16 +58,18 @@ export default function Home({navigation}: any) {
 
 
     useEffect(() => {
+        subscribe();
         NetInfo.fetch().then(state => {
-            console.log("Connection type", state.type);
-            console.log("Is connecteddd?", state.isConnected);
+            console.log('Connection type', state.type);
+            console.log('Is connecteddd?', state.isConnected);
+            setConnected(state.isConnected);
         });
-        const locationConfig = {skipPermissionRequests:false,authorizationLevel:"whenInUse"}
+        const locationConfig = {skipPermissionRequests: false, authorizationLevel: 'whenInUse'}
         Geolocation.setRNConfiguration(locationConfig as GeolocationConfiguration);
         getPermissions().then(result => {
             console.log(result)
         });
-
+        getPosition();
 
     }, []);
 
@@ -65,18 +87,12 @@ export default function Home({navigation}: any) {
         }
     }
     const getPosition = () => {
+        console.log('getPosition')
         Geolocation.getCurrentPosition(
             position => {
                 const initialPosition = JSON.stringify(position);
-                console.log('POSITION')
-                console.log(initialPosition)
-                console.log(position)
-                // @ts-ignore
                 setLatitude(position.coords.latitude);
-                // @ts-ignore
                 setLongitude(position.coords.longitude);
-                console.log(lat);
-                console.log(lon);
                 handleForecast();
             },
             error => console.log('Error', JSON.stringify(error)),
@@ -95,23 +111,108 @@ export default function Home({navigation}: any) {
                 scrollref = ref
             }}>
                 <ScrollPage style={{width: screenWidth}}>
-                    <TopBar>
-                        <TopInfo>
-                            <TextContainer>
-                                <PageTitle>Home</PageTitle>
-                            </TextContainer>
-                        </TopInfo>
-                        {/*<Footer>*/}
 
-                        {/*</Footer>*/}
-                    </TopBar>
+                    {forecast && forecast.results ?
+                        <TopBar>
+                            <NetStatusView>
+                                <Text>{connected ? 'ONLINE' : 'OFFLINE'}</Text>
+                            </NetStatusView>
+
+
+                            <CurrentDayIconView>
+                                {Weather.getIconByCondition(forecast.results.condition_slug)}
+                                <CityText>{forecast.results.city}</CityText>
+                                <DescriptionText>{forecast.results.description}</DescriptionText>
+                            </CurrentDayIconView>
+                            <ForecastContainer>
+                                <ForecastInternalContainer>
+                                    <ForecastBlockContainer>
+                                        <ForecastIconView><Icon solid type={'font-awesome-5'} name='temperature-low'
+                                                                size={25} color={'black'}/></ForecastIconView>
+                                        <ForecastDataView><Text>{forecast.results.temp} °C</Text></ForecastDataView>
+                                    </ForecastBlockContainer>
+                                    <ForecastBlockContainer>
+                                        <ForecastIconView><Icon solid type={'font-awesome-5'} name='wind' size={25}
+                                                                color={'black'}/></ForecastIconView>
+                                        <ForecastDataView><Text>{forecast.results.wind_speedy}</Text></ForecastDataView>
+                                    </ForecastBlockContainer>
+                                </ForecastInternalContainer>
+                                <ForecastInternalContainer>
+                                    <ForecastBlockContainer>
+                                        <ForecastIconView><Icon solid type={'material-community'}
+                                                                name='weather-sunset-up' size={30}
+                                                                color={'black'}/></ForecastIconView>
+                                        <ForecastDataView><Text>{forecast.results.sunrise}</Text></ForecastDataView>
+                                    </ForecastBlockContainer>
+                                    <ForecastBlockContainer>
+                                        <ForecastIconView><Icon solid type={'material-community'}
+                                                                name='weather-sunset-down' size={30}
+                                                                color={'black'}/></ForecastIconView>
+                                        <ForecastDataView><Text>{forecast.results.sunset}</Text></ForecastDataView>
+                                    </ForecastBlockContainer>
+                                </ForecastInternalContainer>
+                                <ForecastInternalContainer>
+                                    <ForecastBlockContainer>
+                                        <ForecastIconView><Icon type={'font-awesome-5'} name='calendar-alt' size={25}
+                                                                color={'black'}/></ForecastIconView>
+                                        <ForecastDataView><Text>{forecast.results.date}</Text></ForecastDataView>
+                                    </ForecastBlockContainer>
+                                    <ForecastBlockContainer>
+                                        <ForecastIconView><Icon type={'font-awesome-5'} name='clock' size={25}
+                                                                color={'black'}/></ForecastIconView>
+                                        <ForecastDataView><Text>{forecast.results.time}</Text></ForecastDataView>
+                                    </ForecastBlockContainer>
+                                </ForecastInternalContainer>
+                                <ForecastInternalContainer>
+                                    <ForecastBlockContainer>
+                                        <ForecastIconView><Icon solid type={'material-community'} name='water-percent'
+                                                                size={30} color={'black'}/></ForecastIconView>
+                                        <ForecastDataView><Text>{forecast.results.humidity} %</Text></ForecastDataView>
+                                    </ForecastBlockContainer>
+                                    <ForecastBlockContainer>
+                                    </ForecastBlockContainer>
+                                </ForecastInternalContainer>
+                            </ForecastContainer>
+
+                        </TopBar> : <></>}
                     <BottomBar>
-                        <View>
-                            {lastUpdate ? <Text>{Dates.dateDDMMYYYYandHours(lastUpdate)}</Text> : <Text>Previsão não atualizada.</Text>}
-                        </View>
+                        {forecast && forecast.results ?
+                        <ForecastDaysContainer horizontal>
+                            {forecast.results.forecast.map((item: ForecastDayModel) =>
+                                <View key={forecast.results.forecast.indexOf(item)}>
+                                    <Selector item={item} >
+                                        {Weather.getIconByCondition(forecast.results.condition)}
+                                        <ForecastDaysDetailsView>
+                                            <ForecastBlockContainer>
+                                                <ForecastIconView><Icon type={'font-awesome-5'} name='calendar-alt' size={25}
+                                                                        color={'black'}/></ForecastIconView>
+                                                <ForecastDataView><Text> {item.date}</Text></ForecastDataView>
+                                            </ForecastBlockContainer>
+                                        </ForecastDaysDetailsView>
+                                        <ForecastDaysDetailsView>
+                                            <ForecastBlockContainer>
+                                                <ForecastIconView><Icon type={'font-awesome-5'} name='temperature-high' size={25}
+                                                                        color={'black'}/></ForecastIconView>
+                                                <ForecastDataView><Text> {item.max} °C</Text></ForecastDataView>
+                                            </ForecastBlockContainer>
+                                        </ForecastDaysDetailsView>
+                                        <ForecastDaysDetailsView>
+                                            <ForecastBlockContainer>
+                                                <ForecastIconView><Icon type={'font-awesome-5'} name='temperature-low' size={25}
+                                                                        color={'black'}/></ForecastIconView>
+                                                <ForecastDataView><Text> {item.min} °C</Text></ForecastDataView>
+                                            </ForecastBlockContainer>
+                                        </ForecastDaysDetailsView>
+                                    </Selector>
+                                    <SelectorText>{item.weekday}</SelectorText>
+                                </View>
+                            )}
+                        </ForecastDaysContainer>
+                        : <></> }
+
                         <Footer>
                             <TouchableOpacity style={{width: '100%'}} onPress={() => getPosition()}>
-                                    <Text>ATUALIZAR</Text>
+                                <Text>ATUALIZAR</Text>
                             </TouchableOpacity>
                         </Footer>
                     </BottomBar>
