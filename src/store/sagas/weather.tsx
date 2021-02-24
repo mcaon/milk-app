@@ -8,9 +8,17 @@ export function* setForecast() {
     const lat = yield select(state => state.weather.latitude);
     const long = yield select(state => state.weather.longitude);
     const params = {lat: lat.toString(), lon: long.toString(), user_ip: 'remote'}
-    const forecast = yield call(getForecastByCityCoordinates, params);
-    yield put(Creators.forecastSuccess(forecast.data));
-    yield put(Creators.setLastUpdate(new Date()));
+    try {
+      const forecast = yield call(getForecastByCityCoordinates, params);
+      yield put(Creators.forecastSuccess(forecast.data));
+      yield put(Creators.setLastUpdate(new Date()));
+    } catch (e) {
+      console.log('error setForecast')
+      console.log(e)
+      setSnackbarInfos('Erro ao atualizar Previsão do Tempo', true);
+    }
+
+
   } catch (error) {
     setSnackbarInfos('Erro ao atualizar Previsão do Tempo', true);
     console.log('Erro ao atualizar Previsão do Tempo');

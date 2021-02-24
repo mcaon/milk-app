@@ -5,10 +5,13 @@ import { ActivityIndicatorStyled, LoaderStyled } from './styles';
 import Text from '../Text';
 import Whitespace from '../Whitespace';
 import { Metrics } from '../../../config';
+import {useWeatherIsFetching} from '../../../store/hooks/weather';
 
 const Loader = () => {
   const fadeAnim = useRef(new Animated.Value(0)).current; // Initial value for opacity: 0
   const [loading, setLoading] = useState(false);
+
+  const forecastLoading = useWeatherIsFetching();
 
   useEffect(() => {
     Animated.timing(fadeAnim, {
@@ -18,6 +21,13 @@ const Loader = () => {
     }).start();
   }, [loading]);
 
+  useEffect(() => {
+    setLoading(
+      forecastLoading
+    );
+  }, [
+    forecastLoading
+  ]);
 
   return loading ? (
     <Animated.View
@@ -28,7 +38,7 @@ const Loader = () => {
     >
       <LoaderStyled>
         <Text size={Metrics.fontSize.xsm} color={Colors.mainTheme.black}>
-          {t('loadingMessage')}
+          Por favor aguarde. Carregando...
         </Text>
         <Whitespace height={Metrics.spacingLG} />
         <ActivityIndicatorStyled size="large" color={Colors.mainTheme.black} />

@@ -14,6 +14,7 @@ import NavigationService from './config/NavigationService';
 import Snackbar from './components/Snackbar';
 import {Icon} from 'react-native-elements';
 import Home from './pages/Home';
+import {Loader} from './components/common';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -69,6 +70,7 @@ const App = () => {
                             </ThemeProvider>
                         </NavigationContainer>
                         <Snackbar />
+                        <Loader/>
                     </PaperProvider>
                 </Provider>
             </SafeAreaView>

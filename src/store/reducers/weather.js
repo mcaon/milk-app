@@ -13,18 +13,21 @@ const INITIAL_STATE = {
   latitude: '',
   longitude: '',
   lastUpdate: '',
+  isfetching: false,
 };
 
 const forecastSuccess = (state = INITIAL_STATE, { forecast }) => {
   return {
     ...state,
-    forecast: forecast
+    forecast: forecast,
+    isfetching: false,
   };
 };
 
 const forecastRequest = (state = INITIAL_STATE) => {
   return {
-    ...state
+    ...state,
+    isfetching: true,
   };
 };
 

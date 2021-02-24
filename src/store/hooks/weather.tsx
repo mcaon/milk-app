@@ -65,3 +65,8 @@ export const useWeatherLongitude = () => {
 export const useWeatherLastUpdate = () => {
     return useSelector((state: any) => state.weather.lastUpdate);
 };
+
+export const useWeatherIsFetching = () => {
+    return useSelector((state: any) => state.weather.isfetching);
+};
+
