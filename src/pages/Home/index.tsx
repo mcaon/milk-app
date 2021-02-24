@@ -57,8 +57,6 @@ export default function Home({navigation}: any) {
     const setLatitude = useWeatherSetLatitude();
     const setLongitude = useWeatherSetLongitude();
     const subscribe = NetInfo.addEventListener(state => {
-        console.log("Connection type", state.type);
-        console.log("Is connected LISTENER?", state.isConnected);
         setConnected(state.isConnected);
     });
     const setForecast = useWeatherSetForecast();
@@ -71,8 +69,6 @@ export default function Home({navigation}: any) {
     useEffect(() => {
         subscribe();
         NetInfo.fetch().then(state => {
-            console.log('Connection type', state.type);
-            console.log('Is connecteddd?', state.isConnected);
             setConnected(state.isConnected);
         });
         const locationConfig = {skipPermissionRequests: false, authorizationLevel: 'whenInUse'}
@@ -92,13 +88,11 @@ export default function Home({navigation}: any) {
                 ]
             );
             return granted;
-            // console.log(granted)
         } catch (err) {
             console.warn(err);
         }
     }
     const getPosition = () => {
-        console.log('getPosition')
         Geolocation.getCurrentPosition(
             position => {
                 const initialPosition = JSON.stringify(position);
