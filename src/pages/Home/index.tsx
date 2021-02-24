@@ -12,7 +12,14 @@ import {
     ForecastBlockContainer,
     DescriptionText,
     ForecastIconView,
-    ForecastDataView, NetStatusView, ForecastDaysContainer, SelectorText, Selector, ForecastDaysDetailsView
+    ForecastDataView,
+    NetStatusView,
+    ForecastDaysContainer,
+    SelectorText,
+    Selector,
+    ForecastDaysDetailsView,
+    OnlineText,
+    OfflineText
 } from './styles';
 import {Dimensions, PermissionsAndroid, TouchableOpacity, Text, View} from 'react-native';
 // @ts-ignore
@@ -32,6 +39,7 @@ import {Dates, Weather} from '../../utils';
 import {Icon} from 'react-native-elements';
 import {useUserConnected, useUserSetConnected} from '../../store/hooks/user';
 import {ForecastDayModel} from '../../shared/models/forecast-day.model';
+import {ForecastModel} from '../../shared/models/forecast.model';
 // Listener para verificar conexão
 
 
@@ -39,7 +47,7 @@ export default function Home({navigation}: any) {
 
     const lat = useWeatherLatitude();
     const lon = useWeatherLongitude();
-    const forecast = useWeatherForecast();
+    const forecast: ForecastModel = useWeatherForecast();
     const connected = useUserConnected();
     const setConnected = useUserSetConnected();
     const lastUpdate = useWeatherLastUpdate();
@@ -115,10 +123,8 @@ export default function Home({navigation}: any) {
                     {forecast && forecast.results ?
                         <TopBar>
                             <NetStatusView>
-                                <Text>{connected ? 'ONLINE' : 'OFFLINE'}</Text>
+                                {connected ? <OnlineText>ONLINE</OnlineText> : <OfflineText>OFFLINE</OfflineText>}
                             </NetStatusView>
-
-
                             <CurrentDayIconView>
                                 {Weather.getIconByCondition(forecast.results.condition_slug)}
                                 <CityText>{forecast.results.city}</CityText>
@@ -181,7 +187,7 @@ export default function Home({navigation}: any) {
                             {forecast.results.forecast.map((item: ForecastDayModel) =>
                                 <View key={forecast.results.forecast.indexOf(item)}>
                                     <Selector item={item} >
-                                        {Weather.getIconByCondition(forecast.results.condition)}
+                                        {Weather.getIconByCondition(item.condition)}
                                         <ForecastDaysDetailsView>
                                             <ForecastBlockContainer>
                                                 <ForecastIconView><Icon type={'font-awesome-5'} name='calendar-alt' size={25}

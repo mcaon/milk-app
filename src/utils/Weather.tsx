@@ -1,8 +1,7 @@
-import { format } from 'date-fns'
 import {Icon} from 'react-native-elements';
 import React from 'react';
 
-const getIconByCondition = (condition: string) => {
+const getIconByCondition = (condition: any) => {
   switch (condition) {
     case 'cloud':
       return <Icon solid type={'font-awesome-5'} name='cloud' size={60} color={'black'}/>;

@@ -5,6 +5,20 @@ export const MilkScroll = styled.ScrollView`
     height: 100%;
 `;
 
+export const OfflineText = styled.Text`
+    font-family: Roboto-Regular;
+    font-size: 14px;
+    font-weight: bold;
+    color: ${({theme}) => theme.palette.fail};
+`;
+
+export const OnlineText = styled.Text`
+    font-family: Roboto-Regular;
+    font-size: 14px;
+    font-weight: bold;
+    color: ${({theme}) => theme.palette.success};
+`;
+
 export const ScrollPage = styled.View`
     flex: 2;
 `;
@@ -107,9 +121,8 @@ export const Selector = styled.TouchableOpacity`
 
 export const SelectorText = styled.Text`
     font-family: Roboto-Regular;
-    font-size: 14px;
-    padding: 5px 20px 10px 20px;
-    max-width: 110px;
+    font-size: 19px;
+    padding: 10px;
     textAlign: center;
-    
+    font-weight: bold;
 `;
